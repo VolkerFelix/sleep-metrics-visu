@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4 text-center">
+                <h1 class="card-title mb-4">Sleep Data Dashboard</h1>
+                <p class="lead mb-4">
+                    View and analyze your sleep metrics to improve your sleep quality and overall health.
+                </p>
+                
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Access Your Sleep Data</h5>
+                        <form action="{{ url_for('dashboard.view') }}" method="get" class="mt-3">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" id="user_id" name="user_id" 
+                                           placeholder="Enter your User ID" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="days" name="days">
+                                        <option value="7">Last 7 days</option>
+                                        <option value="14">Last 14 days</option>
+                                        <option value="30" selected>Last 30 days</option>
+                                        <option value="90">Last 90 days</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="submit" class="btn btn-primary w-100">View</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <p class="text-muted mb-3">
+                    Don't have any sleep data yet?
+                </p>
+                <a href="{{ url_for('main.generate_dummy_data') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-database me-2"></i>Generate Test Data
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Available Dashboards</h2>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Sleep Overview</h5>
+                <p class="card-text">
+                    Get a comprehensive overview of your sleep patterns, including sleep duration, quality, and consistency.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-grid">
+                    <button class="btn btn-outline-primary" disabled>View Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Sleep Quality Analysis</h5>
+                <p class="card-text">
+                    Dive deep into your sleep quality metrics to understand what factors affect your sleep quality.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-grid">
+                    <button class="btn btn-outline-primary" disabled>View Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Sleep Health Analytics</h5>
+                <p class="card-text">
+                    Advanced analytics showing correlations between your sleep data and health indicators.
+                </p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-grid">
+                    <button class="btn btn-outline-primary" disabled>View Dashboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

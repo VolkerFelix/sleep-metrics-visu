@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <h1 class="display-4 mb-4">About Sleep Data Visualization</h1>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h2>Overview</h2>
+                <p>
+                    Sleep Data Visualization is a Flask-based web application designed to help you understand
+                    and analyze your sleep patterns. By connecting to the Sleep Data Microservice, this application
+                    provides intuitive visualizations and insights about your sleep quality, duration, and consistency.
+                </p>
+                <p>
+                    Whether you're tracking your sleep for health reasons, or just curious about your sleep patterns,
+                    our visualization tools can help you gain valuable insights from your sleep data.
+                </p>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h2>Features</h2>
+                <div class="row mt-3">
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-chart-line fa-2x text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h4>Interactive Dashboards</h4>
+                                <p>
+                                    View your sleep metrics through interactive charts and graphs that help you understand
+                                    trends and patterns in your sleep data.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-bed fa-2x text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h4>Sleep Quality Analysis</h4>
+                                <p>
+                                    Analyze your sleep quality based on various metrics including deep sleep, REM sleep,
+                                    and sleep consistency.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-heartbeat fa-2x text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h4>Heart Rate Monitoring</h4>
+                                <p>
+                                    Track how your heart rate changes during your sleep and identify potential areas
+                                    for health improvement.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <div class="d-flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-calendar-alt fa-2x text-primary"></i>
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h4>Time-Based Analysis</h4>
+                                <p>
+                                    View your sleep data across different time periods to identify long-term trends
+                                    and seasonal patterns.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h2>Technical Details</h2>
+                <p>
+                    This application is built using Flask, a lightweight WSGI web application framework in Python.
+                    It connects to the Sleep Data Microservice REST API to retrieve and analyze sleep data.
+                </p>
+                
+                <h5 class="mt-3">Technologies Used:</h5>
+                <ul>
+                    <li><strong>Flask:</strong> Web application framework</li>
+                    <li><strong>Plotly:</strong> Interactive visualization library</li>
+                    <li><strong>Bootstrap:</strong> Frontend CSS framework</li>
+                    <li><strong>Pandas:</strong> Data analysis tool</li>
+                    <li><strong>Sleep Data Microservice API:</strong> Data source for sleep metrics</li>
+                </ul>
+                
+                <h5 class="mt-3">Data Sources:</h5>
+                <p>
+                    This application does not store any sleep data itself. All data is retrieved from the Sleep Data
+                    Microservice API. You can generate test data or connect to real sleep data sources through the microservice.
+                </p>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2>Getting Started</h2>
+                <p>
+                    To get started with Sleep Data Visualization:
+                </p>
+                <ol>
+                    <li>Make sure the Sleep Data Microservice is running and accessible</li>
+                    <li>Generate test data using the "Generate Data" feature or import your real sleep data</li>
+                    <li>Enter your User ID in the dashboard to view your sleep metrics</li>
+                    <li>Explore the various visualizations and analytics tools</li>
+                </ol>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('main.generate_dummy_data') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-database me-2"></i>Generate Test Data
+                    </a>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-line me-2"></i>View Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

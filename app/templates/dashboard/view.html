@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    .stat-card {
+        transition: transform 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    .chart-container {
+        height: 400px;
+        width: 100%;
+    }
+    .small-chart-container {
+        height: 250px;
+        width: 100%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Sleep Dashboard: {{ user_id }}</h1>
+    
+    <div class="d-flex">
+        <form action="{{ url_for('dashboard.view') }}" method="get" class="d-flex me-2">
+            <input type="hidden" name="user_id" value="{{ user_id }}">
+            <select class="form-select" id="days" name="days" onchange="this.form.submit()">
+                <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 days</option>
+                <option value="14" {% if days == 14 %}selected{% endif %}>Last 14 days</option>
+                <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 days</option>
+                <option value="90" {% if days == 90 %}selected{% endif %}>Last 90 days</option>
+                <option value="180" {% if days == 180 %}selected{% endif %}>Last 6 months</option>
+                <option value="365" {% if days == 365 %}selected{% endif %}>Last year</option>
+            </select>
+        </form>
+        
+        <a href="{{ url_for('dashboard.analytics', user_id=user_id, days=days) }}" class="btn btn-outline-primary">
+            <i class="fas fa-chart-line me-2"></i>Advanced Analytics
+        </a>
+    </div>
+</div>
+
+<!-- Stats Summary -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm stat-card border-primary">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">Average Sleep Duration</h6>
+                <h2 class="mb-0">{{ "%.1f"|format(sleep_analytics.average_duration_hours or 0) }} hrs</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm stat-card border-success">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">Average Sleep Quality</h6>
+                <h2 class="mb-0">{{ "%.1f"|format(sleep_analytics.average_sleep_quality or 0) }}/100</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm stat-card border-info">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">Average Deep Sleep</h6>
+                <h2 class="mb-0">{{ "%.1f"|format(sleep_analytics.average_deep_sleep_minutes or 0) }} min</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card h-100 shadow-sm stat-card border-warning">
+            <div class="card-body text-center">
+                <h6 class="text-muted mb-1">Records Analyzed</h6>
+                <h2 class="mb-0">{{ sleep_analytics.total_records or 0 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Charts -->
+<div class="row mb-4">
+    <div class="col-md-12 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Sleep Quality & Duration Over Time</h5>
+            </div>
+            <div class="card-body">
+                <div id="sleep_quality_duration_chart" class="chart-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Sleep Phases Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div id="sleep_phases_chart" class="small-chart-container"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Heart Rate During Sleep</h5>
+            </div>
+            <div class="card-body">
+                <div id="heart_rate_chart" class="small-chart-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trends and Insights -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Sleep Trends</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% if sleep_analytics.duration_trend %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Sleep Duration</h6>
+                            <p class="text-muted mb-0">
+                                {{ sleep_analytics.duration_trend.direction | title }} by 
+                                {{ "%.1f"|format(sleep_analytics.duration_trend.average_change * 60) }} min/day
+                            </p>
+                        </div>
+                        <span class="badge bg-{{ 'success' if sleep_analytics.duration_trend.direction == 'increasing' else 'danger' if sleep_analytics.duration_trend.direction == 'decreasing' else 'secondary' }} rounded-pill">
+                            <i class="fas fa-{{ 'arrow-up' if sleep_analytics.duration_trend.direction == 'increasing' else 'arrow-down' if sleep_analytics.duration_trend.direction == 'decreasing' else 'equals' }}"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+                    
+                    {% if sleep_analytics.quality_trend %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Sleep Quality</h6>
+                            <p class="text-muted mb-0">
+                                {{ sleep_analytics.quality_trend.direction | title }} by 
+                                {{ "%.1f"|format(sleep_analytics.quality_trend.average_change) }} points/day
+                            </p>
+                        </div>
+                        <span class="badge bg-{{ 'success' if sleep_analytics.quality_trend.direction == 'improving' else 'danger' if sleep_analytics.quality_trend.direction == 'declining' else 'secondary' }} rounded-pill">
+                            <i class="fas fa-{{ 'arrow-up' if sleep_analytics.quality_trend.direction == 'improving' else 'arrow-down' if sleep_analytics.quality_trend.direction == 'declining' else 'equals' }}"></i>
+                        </span>
+                    </li>
+                    {% endif %}
+                    
+                    {% if sleep_analytics.schedule_consistency %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Sleep Schedule Consistency</h6>
+                            <p class="text-muted mb-0">
+                                {{ sleep_analytics.schedule_consistency.rating | title }}
+                                ({{ sleep_analytics.schedule_consistency.score }}/100)
+                            </p>
+                        </div>
+                        <span class="badge bg-{{ 'success' if sleep_analytics.schedule_consistency.rating in ['excellent', 'good'] else 'warning' if sleep_analytics.schedule_consistency.rating == 'fair' else 'danger' }} rounded-pill">
+                            {{ sleep_analytics.schedule_consistency.rating | title }}
+                        </span>
+                    </li>
+                    {% endif %}
+                    
+                    {% if sleep_analytics.duration_variability %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">Sleep Duration Variability</h6>
+                            <p class="text-muted mb-0">
+                                {{ sleep_analytics.duration_variability.rating | title }}
+                                ({{ sleep_analytics.duration_variability.score }}/100)
+                            </p>
+                        </div>
+                        <span class="badge bg-{{ 'success' if sleep_analytics.duration_variability.rating in ['excellent', 'good'] else 'warning' if sleep_analytics.duration_variability.rating == 'fair' else 'danger' }} rounded-pill">
+                            {{ sleep_analytics.duration_variability.rating | title }}
+                        </span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-transparent">
+                <h5 class="mb-0">Recommendations</h5>
+            </div>
+            <div class="card-body">
+                {% if sleep_analytics.recommendations %}
+                <ul class="list-group list-group-flush">
+                    {% for recommendation in sleep_analytics.recommendations %}
+                    <li class="list-group-item">
+                        <i class="fas fa-lightbulb text-warning me-2"></i>
+                        {{ recommendation }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No recommendations available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Sleep Records -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Recent Sleep Records</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Duration</th>
+                    <th>Quality</th>
+                    <th>Deep Sleep</th>
+                    <th>REM Sleep</th>
+                    <th>Avg Heart Rate</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in sleep_records %}
+                <tr>
+                    <td>{{ record.date }}</td>
+                    <td>{{ "%.1f"|format(record.duration_hours) }} hrs</td>
+                    <td>
+                        {% if record.sleep_quality %}
+                        <div class="d-flex align-items-center">
+                            <div class="progress flex-grow-1" style="height: 8px;">
+                                <div class="progress-bar bg-{{ 'success' if record.sleep_quality >= 80 else 'warning' if record.sleep_quality >= 60 else 'danger' }}" 
+                                     role="progressbar" style="width: {{ record.sleep_quality }}%"></div>
+                            </div>
+                            <span class="ms-2">{{ record.sleep_quality }}</span>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.sleep_phases and record.sleep_phases.deep_sleep_minutes %}
+                        {{ record.sleep_phases.deep_sleep_minutes }} min
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.sleep_phases and record.sleep_phases.rem_sleep_minutes %}
+                        {{ record.sleep_phases.rem_sleep_minutes }} min
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if record.heart_rate and record.heart_rate.average %}
+                        {{ "%.1f"|format(record.heart_rate.average) }} bpm
+                        {% else %}
+                        <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('dashboard.view_record', record_id=record.id, user_id=user_id) }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                
+                {% if not sleep_records %}
+                <tr>
+                    <td colspan="7" class="text-center py-3">No sleep records found.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Fetch data for charts
+    fetch(`{{ url_for('dashboard.api_sleep_data', user_id=user_id, days=days) }}`)
+        .then(response => response.json())
+        .then(data => {
+            createQualityDurationChart(data);
+            createSleepPhasesChart(data);
+            createHeartRateChart(data);
+        })
+        .catch(error => console.error('Error fetching chart data:', error));
+    
+    function createQualityDurationChart(data) {
+        const traces = [
+            {
+                x: data.dates,
+                y: data.sleep_quality,
+                name: 'Sleep Quality',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: 'rgba(75, 192, 192, 1)', width: 2 },
+                marker: { size: 6 },
+                yaxis: 'y'
+            },
+            {
+                x: data.dates,
+                y: data.duration_hours,
+                name: 'Sleep Duration (hours)',
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: { color: 'rgba(153, 102, 255, 1)', width: 2 },
+                marker: { size: 6 },
+                yaxis: 'y2'
+            }
+        ];
+        
+        const layout = {
+            autosize: true,
+            margin: { l: 50, r: 50, t: 30, b: 80 },
+            xaxis: {
+                title: 'Date',
+                tickangle: -45
+            },
+            yaxis: {
+                title: 'Sleep Quality',
+                range: [0, 100],
+                titlefont: { color: 'rgba(75, 192, 192, 1)' },
+                tickfont: { color: 'rgba(75, 192, 192, 1)' }
+            },
+            yaxis2: {
+                title: 'Sleep Duration (hours)',
+                titlefont: { color: 'rgba(153, 102, 255, 1)' },
+                tickfont: { color: 'rgba(153, 102, 255, 1)' },
+                overlaying: 'y',
+                side: 'right',
+                range: [0, 12]
+            },
+            legend: {
+                orientation: 'h',
+                y: -0.2
+            },
+            hovermode: 'closest'
+        };
+        
+        Plotly.newPlot('sleep_quality_duration_chart', traces, layout, { responsive: true });
+    }
+    
+    function createSleepPhasesChart(data) {
+        // Calculate averages for sleep phases
+        let deepSleep = 0, remSleep = 0, lightSleep = 0, awake = 0, count = 0;
+        
+        for (let i = 0; i < data.deep_sleep_percentage.length; i++) {
+            if (data.deep_sleep_percentage[i] !== null) {
+                deepSleep += data.deep_sleep_percentage[i];
+                remSleep += data.rem_sleep_percentage[i];
+                lightSleep += data.light_sleep_percentage[i];
+                // Assume awake is the remainder to 100%
+                awake += 100 - (data.deep_sleep_percentage[i] + data.rem_sleep_percentage[i] + data.light_sleep_percentage[i]);
+                count++;
+            }
+        }
+        
+        const values = count > 0 ? [
+            deepSleep / count,
+            remSleep / count,
+            lightSleep / count,
+            awake / count
+        ] : [25, 25, 25, 25]; // Default values if no data
+        
+        const trace = {
+            labels: ['Deep Sleep', 'REM Sleep', 'Light Sleep', 'Awake'],
+            values: values,
+            type: 'pie',
+            marker: {
+                colors: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ]
+            },
+            textinfo: 'label+percent',
+            insidetextorientation: 'radial'
+        };
+        
+        const layout = {
+            autosize: true,
+            margin: { l: 0, r: 0, t: 30, b: 0 },
+            showlegend: false
+        };
+        
+        Plotly.newPlot('sleep_phases_chart', [trace], layout, { responsive: true });
+    }
+    
+    function createHeartRateChart(data) {
+        const trace = {
+            x: data.dates,
+            y: data.heart_rate_avg,
+            type: 'scatter',
+            mode: 'lines+markers',
+            line: { color: 'rgba(255, 99, 132, 1)', width: 2 },
+            marker: { size: 6 }
+        };
+        
+        const layout = {
+            autosize: true,
+            margin: { l: 50, r: 30, t: 30, b: 50 },
+            xaxis: {
+                title: 'Date',
+                tickangle: -45
+            },
+            yaxis: {
+                title: 'Average Heart Rate (bpm)'
+            },
+            hovermode: 'closest'
+        };
+        
+        Plotly.newPlot('heart_rate_chart', [trace], layout, { responsive: true });
+    }
+</script>
+{% endblock %}

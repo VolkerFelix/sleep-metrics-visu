@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row align-items-center">
+    <div class="col-md-6">
+        <h1 class="display-4">Sleep Data Visualization</h1>
+        <p class="lead">Track, analyze, and visualize your sleep patterns for better health insights.</p>
+        <hr class="my-4">
+        <p>
+            Connect to the sleep-data-microservice to visualize your sleep metrics, identify trends,
+            and discover how to improve your sleep quality.
+        </p>
+        <div class="d-grid gap-2 d-md-flex mt-4">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary btn-lg me-md-2">
+                <i class="fas fa-chart-line me-2"></i>View Dashboard
+            </a>
+            <a href="{{ url_for('main.generate_dummy_data') }}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-database me-2"></i>Generate Test Data
+            </a>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card bg-light border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-3">Get Started</h3>
+                <form action="{{ url_for('dashboard.view') }}" method="get">
+                    <div class="mb-3">
+                        <label for="user_id" class="form-label">User ID</label>
+                        <input type="text" class="form-control form-control-lg" id="user_id" name="user_id" 
+                               placeholder="Enter your User ID" required>
+                        <div class="form-text">Enter the unique identifier for your sleep data.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="days" class="form-label">Time Period</label>
+                        <select class="form-select form-select-lg" id="days" name="days">
+                            <option value="7">Last 7 days</option>
+                            <option value="14">Last 14 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="180">Last 6 months</option>
+                            <option value="365">Last year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>View Sleep Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <h2 class="text-center mb-4">Key Features</h2>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-chart-pie fa-3x text-primary"></i>
+                </div>
+                <h3 class="card-title">Interactive Visualizations</h3>
+                <p class="card-text">
+                    Explore your sleep patterns through intuitive and interactive charts that help you understand your sleep metrics.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-analytics fa-3x text-primary"></i>
+                </div>
+                <h3 class="card-title">Advanced Analytics</h3>
+                <p class="card-text">
+                    Get detailed insights about your sleep quality, duration, and consistency with advanced analytics features.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-lightbulb fa-3x text-primary"></i>
+                </div>
+                <h3 class="card-title">Smart Recommendations</h3>
+                <p class="card-text">
+                    Receive personalized recommendations to improve your sleep habits based on your unique sleep patterns.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

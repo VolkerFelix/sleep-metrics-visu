@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - Sleep Metrics Visualization{% endblock %}
+
+{% block content %}
+<div class="analytics">
+    <div class="analytics-header">
+        <h1>Sleep Analytics</h1>
+        <div class="time-period">
+            <select id="period-select" class="select-input">
+                <option value="week">Last Week</option>
+                <option value="month">Last Month</option>
+                <option value="year">Last Year</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="analytics-grid">
+        <div class="analytics-card">
+            <h3>Sleep Pattern Analysis</h3>
+            <div id="pattern-chart" class="chart"></div>
+        </div>
+        <div class="analytics-card">
+            <h3>Sleep Quality Trends</h3>
+            <div id="quality-trend-chart" class="chart"></div>
+        </div>
+        <div class="analytics-card">
+            <h3>Sleep Stage Distribution</h3>
+            <div id="stage-distribution-chart" class="chart"></div>
+        </div>
+        <div class="analytics-card">
+            <h3>Sleep Efficiency</h3>
+            <div id="efficiency-chart" class="chart"></div>
+        </div>
+    </div>
+
+    <div class="insights-section">
+        <h2>Sleep Insights</h2>
+        <div id="insights-container" class="insights-grid">
+            <!-- Insights will be dynamically populated -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+{% endblock %} 
