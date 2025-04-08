@@ -50,7 +50,7 @@ python run.py
 
 2. Open your web browser and navigate to:
 ```
-http://localhost:5000
+http://localhost:5001
 ```
 
 ## Project Structure
