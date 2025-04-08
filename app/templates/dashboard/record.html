@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<style>
+    .form-card {
+        transition: transform 0.3s;
+    }
+    .form-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm form-card">
+            <div class="card-body p-4">
+                <h1 class="card-title mb-4 text-center">Record Sleep Data</h1>
+                
+                <form action="{{ url_for('dashboard.record') }}" method="post">
+                    <input type="hidden" name="user_id" value="{{ user_id }}">
+                    
+                    <div class="mb-4">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label for="sleep_time" class="form-label">Sleep Time</label>
+                            <input type="time" class="form-control" id="sleep_time" name="sleep_time" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="wake_time" class="form-label">Wake Time</label>
+                            <input type="time" class="form-control" id="wake_time" name="wake_time" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="sleep_quality" class="form-label">Sleep Quality (1-10)</label>
+                        <input type="number" class="form-control" id="sleep_quality" name="sleep_quality" 
+                               min="1" max="10" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="Any additional notes about your sleep..."></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Record
+                        </button>
+                        <a href="{{ url_for('dashboard.view', user_id=user_id) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
