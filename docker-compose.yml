@@ -1,0 +1,75 @@
+services:
+  # Sleep Data Microservice
+  sleep-service:
+    image: ghcr.io/volkerfelix/sleep-data-microservice:sha-09eff56@sha256:7508eefa2151197ebaa3270e96e0255c4541ff749668d1389e95fabd80a52cf7
+    ports:
+      - "8001:8001"
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8001
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/sleep_data
+      - LOG_LEVEL=INFO
+      - DEBUG=False
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - sleep-network
+
+  # Visualization Application
+  sleep-visu:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=production
+      - SLEEP_API_BASE_URL=http://sleep-service:8001/api
+      - SECRET_KEY=your-secret-key-here
+    depends_on:
+      - sleep-service
+    networks:
+      - sleep-network
+
+  # PostgreSQL Database for Sleep Data Microservice
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sleep_data
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sleep-network
+
+  # Optional: PgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@sleepdata.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      - postgres
+    networks:
+      - sleep-network
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+networks:
+  sleep-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  pgadmin-data:
