@@ -16,8 +16,15 @@
                         <form action="{{ url_for('dashboard.view') }}" method="get" class="mt-3">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <input type="text" class="form-control" id="user_id" name="user_id" 
-                                           placeholder="Enter your User ID" required>
+                                    <select class="form-select" id="user-dropdown" name="user_id" required>
+                                        <option value="" selected disabled>Select a user...</option>
+                                        <!-- Users will be loaded dynamically -->
+                                    </select>
+                                    <div class="form-text text-start">
+                                        Or <a href="#" id="show-manual-input">enter user ID manually</a>
+                                    </div>
+                                    <input type="text" class="form-control mt-2 d-none" id="manual-user-id" 
+                                           placeholder="Enter your User ID">
                                 </div>
                                 <div class="col-md-3">
                                     <select class="form-select" id="days" name="days">
@@ -99,4 +106,76 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fetch users from the API
+    fetch('{{ url_for("dashboard.api_get_users") }}')
+        .then(response => response.json())
+        .then(users => {
+            const dropdown = document.getElementById('user-dropdown');
+            
+            // Sort users by record count (highest first)
+            users.sort((a, b) => b.record_count - a.record_count);
+            
+            // Add users to dropdown
+            users.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.user_id;
+                option.textContent = `${user.user_id} (${user.record_count} records)`;
+                dropdown.appendChild(option);
+            });
+            
+            // If no users are available, show a message
+            if (users.length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "No users available - generate test data first";
+                option.disabled = true;
+                dropdown.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading users:', error);
+            // Show error message in dropdown
+            const dropdown = document.getElementById('user-dropdown');
+            const option = document.createElement('option');
+            option.value = "";
+            option.textContent = "Error loading users";
+            option.disabled = true;
+            dropdown.appendChild(option);
+        });
+    
+    // Toggle between dropdown and manual input
+    document.getElementById('show-manual-input').addEventListener('click', function(e) {
+        e.preventDefault();
+        const dropdown = document.getElementById('user-dropdown');
+        const manualInput = document.getElementById('manual-user-id');
+        
+        if (dropdown.classList.contains('d-none')) {
+            // Switch to dropdown
+            dropdown.classList.remove('d-none');
+            manualInput.classList.add('d-none');
+            dropdown.setAttribute('name', 'user_id');
+            manualInput.removeAttribute('name');
+            this.textContent = 'enter user ID manually';
+        } else {
+            // Switch to manual input
+            dropdown.classList.add('d-none');
+            manualInput.classList.remove('d-none');
+            manualInput.setAttribute('name', 'user_id');
+            dropdown.removeAttribute('name');
+            this.textContent = 'select from existing users';
+        }
+    });
+    
+    // Copy selected user to manual input when switching
+    document.getElementById('user-dropdown').addEventListener('change', function() {
+        document.getElementById('manual-user-id').value = this.value;
+    });
+});
+</script>
 {% endblock %}

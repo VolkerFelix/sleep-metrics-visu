@@ -1,7 +1,7 @@
 services:
   # Sleep Data Microservice
   sleep-service:
-    image: ghcr.io/volkerfelix/sleep-data-microservice:sha-09eff56@sha256:7508eefa2151197ebaa3270e96e0255c4541ff749668d1389e95fabd80a52cf7
+    image: ghcr.io/volkerfelix/sleep-data-microservice:sha-58f5177@sha256:6eb03f7a6e1d4449d8f7c4c1513a34f534ffdbb13c02935852f715d50b7294cf
     ports:
       - "8001:8001"
     environment:

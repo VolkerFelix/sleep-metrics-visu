@@ -106,7 +106,7 @@ class SleepRecord:
         Args:
             data: Dictionary containing sleep record data
         """
-        self.id = data.get('id')
+        self.record_id = data.get('record_id')
         self.user_id = data.get('user_id')
         self.date = data.get('date')
         
@@ -182,7 +182,7 @@ class SleepRecord:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         result = {
-            'id': self.id,
+            'record_id': self.record_id,
             'user_id': self.user_id,
             'date': self.date,
             'sleep_start': self.sleep_start.isoformat(),

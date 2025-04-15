@@ -2,7 +2,7 @@
 Main routes for the Sleep Data Visualization application.
 """
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, jsonify
 
 from app.api.client import SleepApiClient
 
