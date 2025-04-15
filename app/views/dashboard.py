@@ -160,7 +160,7 @@ def view_record(record_id):
         
         # Find the specific record
         record = next(
-            (r for r in sleep_data_response.get('records', []) if r.get('id') == record_id), 
+            (r for r in sleep_data_response.get('records', []) if r.get('record_id') == record_id), 
             None
         )
         
@@ -241,4 +241,15 @@ def analytics():
         
     except Exception as e:
         flash(f"Error retrieving sleep analytics: {str(e)}", 'danger')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.index'))    
+@dashboard_bp.route('/api/users')
+def api_get_users():
+    """API endpoint to get users for dropdown selection."""
+    try:
+        # Get users using the API client
+        client = SleepApiClient()
+        response = client.get_users(limit=50)  # Limit to a reasonable number for dropdown
+        
+        return jsonify(response.get('users', []))
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

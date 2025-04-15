@@ -151,3 +151,25 @@ class SleepApiClient:
             payload['sleep_duration_trend'] = sleep_duration_trend
         
         return self._make_request('POST', '/sleep/generate', json=payload)
+    
+    def get_users(
+        self,
+        limit: int = 100,
+        offset: int = 0
+    ) -> Dict[str, Any]:
+        """
+        Get a list of unique users with their record counts.
+        
+        Args:
+            limit: Maximum number of users to return
+            offset: Number of users to skip
+            
+        Returns:
+            Dictionary containing users list and count
+        """
+        params = {
+            'limit': limit,
+            'offset': offset
+        }
+        
+        return self._make_request('GET', '/sleep/users', params=params)
